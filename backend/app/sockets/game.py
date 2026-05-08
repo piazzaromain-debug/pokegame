@@ -56,7 +56,15 @@ async def on_game_join(sid: str, data: dict) -> None:
     # Envoyer à ce joueur la liste des joueurs déjà présents
     room = await game_room_manager.get_room(game_id)
     if room:
-        await sio.emit("game:room_state", {"players": list(room.players.values())}, to=sid)
+        players_list = [
+            {
+                "player_id": pid,
+                "pseudo": data["pseudo"],
+                "avatar_pokemon_id": data["avatar_pokemon_id"],
+            }
+            for pid, data in room.players.items()
+        ]
+        await sio.emit("game:room_state", {"players": players_list}, to=sid)
 
     logger.info(f"Player {player_id} ({pseudo}) joined game {game_id}")
 

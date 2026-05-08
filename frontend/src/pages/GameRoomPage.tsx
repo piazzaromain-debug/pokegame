@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePlayerStore } from '../store/playerStore'
@@ -162,6 +162,8 @@ export default function GameRoomPage() {
   const [players, setPlayers] = useState<RoomPlayer[]>([])
   const [notFound, setNotFound] = useState(false)
   const [fetching, setFetching] = useState(true)
+  // Track game start so cleanup doesn't emit game:leave (player stays in room)
+  const gameStartedRef = useRef(false)
 
   // Redirect if not authenticated
   if (!playerId || !pseudo || !avatarPokemonId) {
@@ -207,11 +209,21 @@ export default function GameRoomPage() {
       setPlayers((prev) => prev.filter((p) => p.player_id !== player_id))
     })
 
+    // Socket event: game is starting → navigate to play page (without leaving room)
+    const cleanStarting = on<{ countdown: number }>('game:starting', () => {
+      gameStartedRef.current = true
+      navigate(`/game/${gameId}/play`, { replace: true })
+    })
+
     return () => {
       cleanRoomState()
       cleanPlayerJoined()
       cleanPlayerLeft()
-      emit('game:leave', { game_id: gameId, player_id: playerId })
+      cleanStarting()
+      // Only emit game:leave if the game didn't start (real abandon, not navigation to play)
+      if (!gameStartedRef.current) {
+        emit('game:leave', { game_id: gameId, player_id: playerId })
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId])
@@ -219,8 +231,9 @@ export default function GameRoomPage() {
   const isHost = gameInfo?.host_player_id === playerId
 
   const handleStartGame = useCallback(() => {
-    // Phase 5 — not yet implemented
-  }, [])
+    if (!gameId || !playerId) return
+    emit('game:start', { game_id: gameId, player_id: playerId })
+  }, [gameId, playerId, emit])
 
   if (fetching) return <LoadingScreen />
   if (notFound) {
