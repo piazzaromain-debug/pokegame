@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -15,7 +16,7 @@ class Pokemon(Base):
     sprite_url: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     sprite_shiny_url: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     cry_url: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
-    types: Mapped[list | None] = mapped_column(sa.ARRAY(sa.String), nullable=True)
+    types: Mapped[list | None] = mapped_column(JSONB, nullable=True)
     pokedex_description: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         sa.DateTime(timezone=True),

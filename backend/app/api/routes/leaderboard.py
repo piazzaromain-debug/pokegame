@@ -41,6 +41,8 @@ async def get_leaderboard(
         """), {"mode": mode.value, "difficulty": difficulty.value, "limit": limit})
         rows = result.fetchall()
     except Exception:
+        # Rollback the failed transaction before running the fallback query
+        await db.rollback()
         # Fallback sur jointure directe (view pas encore rafraîchie)
         result = await db.execute(text(f"""
             SELECT
