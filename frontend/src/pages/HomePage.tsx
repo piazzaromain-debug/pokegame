@@ -267,6 +267,18 @@ export default function HomePage() {
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Link
+                  to="/learn"
+                  className="font-orbitron font-bold text-xs uppercase tracking-widest px-5 py-2.5 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 text-center"
+                  style={{
+                    background: 'rgba(255,0,229,0.08)',
+                    border: '1px solid rgba(255,0,229,0.3)',
+                    color: '#ff00e5',
+                    boxShadow: '0 0 10px rgba(255,0,229,0.15)',
+                  }}
+                >
+                  Mode Apprentissage
+                </Link>
+                <Link
                   to="/leaderboard"
                   className="font-orbitron font-bold text-xs uppercase tracking-widest px-5 py-2.5 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 text-center"
                   style={{
