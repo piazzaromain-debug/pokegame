@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { fetchPlayerStats } from '../api/leaderboard'
@@ -397,6 +397,17 @@ export default function ProfilePage() {
       />
 
       <div className="relative z-10 flex flex-col items-center gap-8 py-12 px-4">
+        {/* Bouton retour */}
+        <div className="w-full max-w-3xl">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 font-rajdhani font-semibold text-sm opacity-60 hover:opacity-100 transition-opacity"
+            style={{ color: '#00f5ff' }}
+          >
+            ← Accueil
+          </Link>
+        </div>
+
         {isLoading && <ProfileSkeleton />}
 
         {isError && (

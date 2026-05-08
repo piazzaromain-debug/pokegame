@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { usePokemonList } from '../api/pokemon'
 import { useReducedMotion } from '../hooks/useReducedMotion'
@@ -160,6 +161,17 @@ export default function PokemonDexPage() {
 
       {/* Contenu principal */}
       <div className="relative z-10 flex flex-col items-center gap-6 py-12 px-4">
+        {/* Bouton retour */}
+        <div className="w-full max-w-5xl">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 font-rajdhani font-semibold text-sm transition-all duration-150 hover:opacity-100 opacity-60"
+            style={{ color: '#00f5ff' }}
+          >
+            ← Accueil
+          </Link>
+        </div>
+
         {/* En-tête */}
         <motion.div
           className="flex flex-col items-center gap-2"

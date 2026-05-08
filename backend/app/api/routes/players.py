@@ -51,6 +51,21 @@ async def create_player(
     return PlayerResponse.model_validate(player)
 
 
+@router.get("/players/search", response_model=PlayerResponse | None)
+async def search_player_by_pseudo(
+    pseudo: str,
+    session: AsyncSession = Depends(get_session),
+) -> PlayerResponse | None:
+    """Recherche un joueur par son pseudo exact (pour la reconnexion après déconnexion)."""
+    result = await session.execute(
+        select(Player).where(Player.pseudo == pseudo)
+    )
+    player = result.scalars().first()
+    if player is None:
+        return None
+    return PlayerResponse.model_validate(player)
+
+
 @router.get("/players/{player_id}", response_model=PlayerResponse)
 async def get_player(
     player_id: uuid.UUID,

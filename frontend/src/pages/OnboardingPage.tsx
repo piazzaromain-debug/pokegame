@@ -3,7 +3,8 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { usePlayerStore } from '../store/playerStore'
 import { usePokemonList } from '../api/pokemon'
-import { createPlayer } from '../api/players'
+import { createPlayer, findPlayerByPseudo } from '../api/players'
+import type { PlayerResponse } from '../api/players'
 import type { Pokemon } from '../types/pokemon'
 import '../styles/animations.css'
 
@@ -44,10 +45,11 @@ interface PseudoStepProps {
   pseudo: string
   onChange: (v: string) => void
   onNext: () => void
+  loading?: boolean
   reduced: boolean
 }
 
-function PseudoStep({ pseudo, onChange, onNext, reduced }: PseudoStepProps) {
+function PseudoStep({ pseudo, onChange, onNext, loading = false, reduced }: PseudoStepProps) {
   const isValid = pseudo.length >= 2 && pseudo.length <= 30
   const hasInput = pseudo.length > 0
 
@@ -130,10 +132,10 @@ function PseudoStep({ pseudo, onChange, onNext, reduced }: PseudoStepProps) {
       {/* Bouton Suivant */}
       <button
         className="btn-primary w-full py-4 text-base mt-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
-        disabled={!isValid}
+        disabled={!isValid || loading}
         onClick={onNext}
       >
-        Suivant →
+        {loading ? 'Vérification…' : 'Suivant →'}
       </button>
     </motion.div>
   )
@@ -424,13 +426,32 @@ export default function OnboardingPage() {
   const [pseudo, setPseudo] = useState('')
   const [selectedPokemonId, setSelectedPokemonId] = useState<number | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [checkingPseudo, setCheckingPseudo] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
+  const [existingPlayer, setExistingPlayer] = useState<PlayerResponse | null>(null)
 
   const { data: pokemonList = [], isLoading: pokemonLoading } = usePokemonList()
 
   // Redirect si déjà connecté
   if (playerId !== null) {
     return <Navigate to="/" replace />
+  }
+
+  const handlePseudoNext = async () => {
+    setCheckingPseudo(true)
+    const found = await findPlayerByPseudo(pseudo)
+    setCheckingPseudo(false)
+    if (found) {
+      setExistingPlayer(found)
+    } else {
+      setStep(2)
+    }
+  }
+
+  const handleReconnect = () => {
+    if (!existingPlayer) return
+    setPlayer(existingPlayer.id, existingPlayer.pseudo, existingPlayer.avatar_pokemon_id)
+    navigate('/')
   }
 
   const handleSubmit = async () => {
@@ -540,8 +561,9 @@ export default function OnboardingPage() {
             <PseudoStep
               key="pseudo"
               pseudo={pseudo}
-              onChange={setPseudo}
-              onNext={() => setStep(2)}
+              onChange={(v) => { setPseudo(v); setExistingPlayer(null) }}
+              onNext={handlePseudoNext}
+              loading={checkingPseudo}
               reduced={reduced}
             />
           ) : (
@@ -559,6 +581,55 @@ export default function OnboardingPage() {
               error={apiError}
               reduced={reduced}
             />
+          )}
+        </AnimatePresence>
+
+        {/* Modal reconnexion — profil existant détecté */}
+        <AnimatePresence>
+          {existingPlayer && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="flex flex-col gap-4 rounded-xl px-6 py-5"
+              style={{
+                background: 'rgba(0,245,255,0.06)',
+                border: '1px solid rgba(0,245,255,0.35)',
+                boxShadow: '0 0 20px rgba(0,245,255,0.15)',
+              }}
+            >
+              <p className="font-orbitron text-sm text-center" style={{ color: '#00f5ff' }}>
+                🔍 Profil trouvé !
+              </p>
+              <p className="font-rajdhani text-sm text-center" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                Un dresseur nommé <strong style={{ color: '#fff' }}>{existingPlayer.pseudo}</strong> existe déjà.
+                <br />Veux-tu te reconnecter à ce profil ?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  className="flex-1 py-3 rounded-xl font-rajdhani font-semibold text-sm transition-all duration-150 hover:scale-[1.02]"
+                  style={{
+                    background: 'rgba(0,245,255,0.15)',
+                    border: '1px solid rgba(0,245,255,0.5)',
+                    color: '#00f5ff',
+                  }}
+                  onClick={handleReconnect}
+                >
+                  ✓ Me reconnecter
+                </button>
+                <button
+                  className="flex-1 py-3 rounded-xl font-rajdhani font-semibold text-sm transition-all duration-150 hover:scale-[1.02]"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    color: 'rgba(255,255,255,0.6)',
+                  }}
+                  onClick={() => { setExistingPlayer(null); setStep(2) }}
+                >
+                  + Nouveau profil
+                </button>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
 

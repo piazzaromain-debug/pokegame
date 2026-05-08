@@ -31,3 +31,11 @@ export async function getPlayer(playerId: string): Promise<PlayerResponse> {
   if (!res.ok) throw new Error('Joueur non trouvé')
   return res.json()
 }
+
+/** Recherche un joueur par pseudo exact. Retourne null si aucun profil trouvé. */
+export async function findPlayerByPseudo(pseudo: string): Promise<PlayerResponse | null> {
+  const res = await fetch(`${API_BASE}/players/search?pseudo=${encodeURIComponent(pseudo)}`)
+  if (!res.ok) return null
+  const data = await res.json()
+  return data ?? null
+}

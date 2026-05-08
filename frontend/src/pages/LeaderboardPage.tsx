@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLeaderboard } from '../api/leaderboard'
 import type { GameMode, Difficulty, Period, LeaderboardEntry } from '../api/leaderboard'
@@ -301,6 +302,17 @@ export default function LeaderboardPage() {
 
       {/* Contenu */}
       <div className="relative z-10 flex flex-col items-center gap-6 py-12 px-4">
+        {/* Bouton retour */}
+        <div className="w-full max-w-3xl">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 font-rajdhani font-semibold text-sm transition-all duration-150 hover:opacity-100 opacity-60 hover:opacity-100"
+            style={{ color: '#00f5ff' }}
+          >
+            ← Accueil
+          </Link>
+        </div>
+
         {/* Titre */}
         <motion.div
           className="flex flex-col items-center gap-2"

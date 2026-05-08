@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePlayerStore } from '../store/playerStore'
 import { useSocket } from '../hooks/useSocket'
@@ -506,12 +506,13 @@ export default function LobbyPage() {
         )}
 
         {/* Logo */}
-        <span
-          className="font-orbitron font-bold text-lg absolute left-1/2 -translate-x-1/2"
+        <Link
+          to="/"
+          className="font-orbitron font-bold text-lg absolute left-1/2 -translate-x-1/2 hover:opacity-80 transition-opacity"
           style={{ color: '#ff00e5', textShadow: '0 0 12px rgba(255,0,229,0.6)' }}
         >
           POKÉGAME
-        </span>
+        </Link>
 
         {/* Déconnexion */}
         <button

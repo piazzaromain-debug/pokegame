@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { usePokemonList } from '../api/pokemon'
 import { useReducedMotion } from '../hooks/useReducedMotion'
@@ -529,6 +530,16 @@ export default function LearningModePage() {
 
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center gap-6 py-12 px-4">
+        {/* Bouton retour */}
+        <div className="w-full max-w-5xl">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 font-rajdhani font-semibold text-sm opacity-60 hover:opacity-100 transition-opacity"
+            style={{ color: '#ff00e5' }}
+          >
+            ← Accueil
+          </Link>
+        </div>
 
         {/* Header */}
         <motion.div
