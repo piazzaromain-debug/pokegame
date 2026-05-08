@@ -1,0 +1,103 @@
+# =========================
+# Secrets & Environment
+# =========================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.log
+*.pot
+*.pyc
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# uv / poetry
+uv.lock
+# (poetry.lock versionné, ne pas ignorer)
+
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+.npm
+.yarn/
+.pnp.*
+dist/
+build/
+*.local
+.eslintcache
+.stylelintcache
+.turbo/
+.next/
+.nuxt/
+.vite/
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+
+# =========================
+# IDE / Editors
+# =========================
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.history/
+
+# =========================
+# Database
+# =========================
+*.sqlite
+*.db
+pg_data/
+
+# =========================
+# Misc
+# =========================
+*.bak
+*.tmp
+*.orig
+logs/
