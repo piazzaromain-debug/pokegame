@@ -4,6 +4,8 @@ import PokemonDexPage from './pages/PokemonDexPage'
 import OnboardingPage from './pages/OnboardingPage'
 import LobbyPage from './pages/LobbyPage'
 import GameRoomPage from './pages/GameRoomPage'
+import GamePlayPage from './pages/GamePlayPage'
+import ResultsPage from './pages/ResultsPage'
 
 export default function AppRoutes() {
   return (
@@ -13,6 +15,8 @@ export default function AppRoutes() {
       <Route path="/pokedex" element={<PokemonDexPage />} />
       <Route path="/lobby" element={<LobbyPage />} />
       <Route path="/game/:gameId" element={<GameRoomPage />} />
+      <Route path="/game/:gameId/play" element={<GamePlayPage />} />
+      <Route path="/game/:gameId/results" element={<ResultsPage />} />
     </Routes>
   )
 }

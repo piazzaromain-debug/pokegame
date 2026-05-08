@@ -10,6 +10,9 @@ class GameRoom:
     status: str = "waiting"
     current_question_index: int = -1
     questions: list[dict] = field(default_factory=list)
+    pokemon_map: dict = field(default_factory=dict)
+    current_question_answers: dict = field(default_factory=dict)
+    time_limit_ms: int = 10000
 
 
 class GameRoomManager:
