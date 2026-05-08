@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pokegame
+      POSTGRES_USER: pokegame
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pokegame_dev}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pokegame"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks: [pokegame_net]
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://pokegame:${DB_PASSWORD:-pokegame_dev}@db:5432/pokegame
+      SECRET_KEY: ${SECRET_KEY:-dev_secret_change_in_prod}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    networks: [pokegame_net]
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks: [pokegame_net]
+    command: npm run dev -- --host 0.0.0.0
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - frontend
+      - backend
+    networks: [pokegame_net]
+
+volumes:
+  pg_data:
+
+networks:
+  pokegame_net:
+    driver: bridge
