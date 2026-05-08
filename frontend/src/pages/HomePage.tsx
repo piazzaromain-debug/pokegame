@@ -258,7 +258,7 @@ export default function HomePage() {
             <>
               <PlayerCard />
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="btn-primary text-base px-10 py-4">
+                <button className="btn-primary text-base px-10 py-4" onClick={() => navigate('/lobby')}>
                   Jouer
                 </button>
                 <Link to="/pokedex" className="btn-secondary text-base px-10 py-4">
