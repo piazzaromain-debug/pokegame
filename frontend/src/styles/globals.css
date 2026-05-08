@@ -1,0 +1,86 @@
+@import '@fontsource/orbitron/400.css';
+@import '@fontsource/orbitron/700.css';
+@import '@fontsource/rajdhani/400.css';
+@import '@fontsource/rajdhani/600.css';
+@import '@fontsource/jetbrains-mono/400.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #0a0612;
+  --bg-deep: #050309;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --neon-cyan: #00f5ff;
+  --neon-magenta: #ff00e5;
+  --neon-yellow: #fff200;
+  --neon-green: #00ff88;
+  --neon-red: #ff003c;
+  --neon-purple: #b026ff;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --glow-cyan: 0 0 20px rgba(0, 245, 255, 0.6), 0 0 40px rgba(0, 245, 255, 0.3);
+  --glow-magenta: 0 0 20px rgba(255, 0, 229, 0.6), 0 0 40px rgba(255, 0, 229, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Rajdhani', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100%;
+}
+
+/* Glassmorphism card utilitaire */
+@layer components {
+  .glass-card {
+    @apply backdrop-blur-glass bg-white/[0.04] border border-white/10 rounded-2xl;
+  }
+
+  .neon-border-cyan {
+    border: 1px solid rgba(0, 245, 255, 0.4);
+    box-shadow: var(--glow-cyan);
+  }
+
+  .neon-border-magenta {
+    border: 1px solid rgba(255, 0, 229, 0.4);
+    box-shadow: var(--glow-magenta);
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 font-orbitron font-bold text-sm uppercase tracking-widest
+           bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/40
+           rounded-lg transition-all duration-200
+           hover:bg-neon-cyan/20 hover:shadow-glow-cyan hover:scale-105
+           active:scale-95;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 font-orbitron font-bold text-sm uppercase tracking-widest
+           bg-neon-magenta/10 text-neon-magenta border border-neon-magenta/40
+           rounded-lg transition-all duration-200
+           hover:bg-neon-magenta/20 hover:shadow-glow-magenta hover:scale-105
+           active:scale-95;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

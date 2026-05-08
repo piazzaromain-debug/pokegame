@@ -1,0 +1,3 @@
+export function useReducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}

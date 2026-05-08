@@ -1,0 +1,32 @@
+/* Animations CSS standalone (complément Framer Motion) */
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 245, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Fond animé mesh gradient */
+.animated-bg {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(176, 38, 255, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(0, 245, 255, 0.1) 0%, transparent 40%),
+    radial-gradient(ellipse at 60% 80%, rgba(255, 0, 229, 0.08) 0%, transparent 40%),
+    #0a0612;
+  background-attachment: fixed;
+}
