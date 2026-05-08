@@ -9,13 +9,13 @@ from app.database import Base
 
 
 class GameMode(str, enum.Enum):
-    SOLO = "solo"
-    MULTI = "multi"
+    GUESS_NAME = "guess_name"
+    GUESS_IMAGE = "guess_image"
 
 
 class Difficulty(str, enum.Enum):
     EASY = "easy"
-    MEDIUM = "medium"
+    NORMAL = "normal"
     HARD = "hard"
 
 
@@ -41,12 +41,12 @@ class Game(Base):
     mode: Mapped[GameMode] = mapped_column(
         sa.Enum(GameMode, name="game_mode"),
         nullable=False,
-        default=GameMode.MULTI,
+        default=GameMode.GUESS_NAME,
     )
     difficulty: Mapped[Difficulty] = mapped_column(
         sa.Enum(Difficulty, name="difficulty"),
         nullable=False,
-        default=Difficulty.MEDIUM,
+        default=Difficulty.NORMAL,
     )
     nb_questions: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=10)
     max_players: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=8)

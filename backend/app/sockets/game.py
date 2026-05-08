@@ -12,6 +12,7 @@ from app.models.game_question import GameQuestion, PlayerAnswer
 from app.models.pokemon import Pokemon
 from app.services.question_generator import generate_questions, get_time_limit_ms
 from app.services.scoring import calculate_points
+from app.services.stats_aggregator import aggregate_game_stats
 from app.sockets.manager import game_room_manager
 from app.sockets.server import sio
 
@@ -257,6 +258,7 @@ async def _run_question_loop(game_id: str, difficulty_str: str, room_name: str) 
                 .values(final_score=entry["score"], final_rank=rank_i + 1)
             )
         await db.commit()
+        await aggregate_game_stats(db, uuid.UUID(game_id), final_scoreboard)
 
     room.status = "finished"
     logger.info(

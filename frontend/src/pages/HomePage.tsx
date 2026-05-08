@@ -265,6 +265,32 @@ export default function HomePage() {
                   Voir le Pokédex →
                 </Link>
               </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  to="/leaderboard"
+                  className="font-orbitron font-bold text-xs uppercase tracking-widest px-5 py-2.5 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 text-center"
+                  style={{
+                    background: 'rgba(255,242,0,0.08)',
+                    border: '1px solid rgba(255,242,0,0.3)',
+                    color: '#fff200',
+                    boxShadow: '0 0 10px rgba(255,242,0,0.15)',
+                  }}
+                >
+                  🏆 Leaderboard
+                </Link>
+                <Link
+                  to="/profile"
+                  className="font-orbitron font-bold text-xs uppercase tracking-widest px-5 py-2.5 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 text-center"
+                  style={{
+                    background: 'rgba(0,255,136,0.08)',
+                    border: '1px solid rgba(0,255,136,0.3)',
+                    color: '#00ff88',
+                    boxShadow: '0 0 10px rgba(0,255,136,0.15)',
+                  }}
+                >
+                  👤 Mon profil
+                </Link>
+              </div>
             </>
           ) : (
             <button

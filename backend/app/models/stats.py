@@ -43,7 +43,7 @@ class PokemonStats(Base):
     )
     times_shown: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
     times_correct: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
-    times_wrong: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
+    times_incorrect: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=0)
     updated_at: Mapped[datetime] = mapped_column(
         sa.DateTime(timezone=True),
         nullable=False,

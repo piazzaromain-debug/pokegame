@@ -16,7 +16,7 @@ def get_nb_options(difficulty: Difficulty) -> int:
 def get_time_limit_ms(difficulty: Difficulty) -> int:
     return {
         Difficulty.EASY: 15000,
-        Difficulty.MEDIUM: 10000,
+        Difficulty.NORMAL: 10000,
         Difficulty.HARD: 5000,
     }[difficulty]
 

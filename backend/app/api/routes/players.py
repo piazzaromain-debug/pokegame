@@ -110,3 +110,53 @@ async def update_player(
     await session.commit()
     await session.refresh(player)
     return PlayerResponse.model_validate(player)
+
+
+@router.get("/players/{player_id}/pokedex")
+async def get_player_pokedex(
+    player_id: uuid.UUID,
+    db: AsyncSession = Depends(get_session),
+):
+    """Pokédex personnel : pokemon_seen et pokemon_caught du joueur."""
+    result = await db.execute(
+        select(PlayerStats).where(PlayerStats.player_id == player_id)
+    )
+    stats = result.scalar_one_or_none()
+    if not stats:
+        return {"pokemon_seen": [], "pokemon_caught": []}
+    return {
+        "pokemon_seen": stats.pokemon_seen or [],
+        "pokemon_caught": stats.pokemon_caught or [],
+    }
+
+
+@router.get("/players/{player_id}/stats")
+async def get_player_stats(
+    player_id: uuid.UUID,
+    db: AsyncSession = Depends(get_session),
+):
+    """Stats détaillées d'un joueur."""
+    result = await db.execute(
+        select(PlayerStats).where(PlayerStats.player_id == player_id)
+    )
+    stats = result.scalar_one_or_none()
+    if not stats:
+        raise HTTPException(status_code=404, detail="Stats non trouvées")
+
+    accuracy = 0.0
+    if stats.total_questions and stats.total_questions > 0:
+        accuracy = round(stats.total_correct / stats.total_questions * 100, 1)
+
+    return {
+        "player_id": str(player_id),
+        "games_played": stats.games_played or 0,
+        "games_won": stats.games_won or 0,
+        "total_correct": stats.total_correct or 0,
+        "total_questions": stats.total_questions or 0,
+        "best_streak": stats.best_streak or 0,
+        "total_score": stats.total_score or 0,
+        "accuracy": accuracy,
+        "pokemon_mistakes": stats.pokemon_mistakes or {},
+        "pokemon_seen": stats.pokemon_seen or [],
+        "pokemon_caught": stats.pokemon_caught or [],
+    }
