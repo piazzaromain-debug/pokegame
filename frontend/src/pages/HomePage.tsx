@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { usePlayerStore } from '../store/playerStore'
 import '../styles/animations.css'
 
 // Données statiques pour les particules néon flottantes
@@ -56,7 +57,80 @@ const glowVariants = {
   },
 }
 
+// ─── Player profile card (displayed when logged in) ──────────────────────────
+function PlayerCard() {
+  const { pseudo, avatarPokemonId, clearPlayer } = usePlayerStore()
+  const navigate = useNavigate()
+
+  const spriteUrl = avatarPokemonId
+    ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${avatarPokemonId}.png`
+    : null
+
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+      }}
+      className="glass-card flex items-center gap-4 px-6 py-4"
+      style={{
+        border: '1px solid rgba(0,245,255,0.25)',
+        boxShadow: '0 0 20px rgba(0,245,255,0.08)',
+      }}
+    >
+      {/* Sprite Pokémon dans un cercle */}
+      {spriteUrl && (
+        <div
+          className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{
+            background: 'rgba(0,245,255,0.08)',
+            border: '1px solid rgba(0,245,255,0.35)',
+            boxShadow: '0 0 12px rgba(0,245,255,0.3)',
+          }}
+        >
+          <img
+            src={spriteUrl}
+            alt="avatar"
+            className="w-10 h-10 object-contain"
+            style={{ imageRendering: 'pixelated' }}
+          />
+        </div>
+      )}
+
+      {/* Pseudo + actions */}
+      <div className="flex flex-col gap-1 min-w-0">
+        <span
+          className="font-orbitron font-bold text-sm truncate"
+          style={{ color: '#00f5ff', textShadow: '0 0 10px rgba(0,245,255,0.6)' }}
+        >
+          {pseudo}
+        </span>
+        <div className="flex items-center gap-3">
+          <button
+            className="font-rajdhani text-xs uppercase tracking-widest transition-opacity duration-150 hover:opacity-100 opacity-50"
+            style={{ color: 'rgba(255,255,255,0.6)' }}
+            onClick={() => navigate('/onboarding')}
+          >
+            Changer de profil
+          </button>
+          <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
+          <button
+            className="font-rajdhani text-xs uppercase tracking-widest transition-opacity duration-150 hover:opacity-100 opacity-50"
+            style={{ color: 'rgba(255,0,60,0.8)' }}
+            onClick={clearPlayer}
+          >
+            Déconnexion
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
 export default function HomePage() {
+  const { playerId } = usePlayerStore()
+  const navigate = useNavigate()
+
   return (
     <div className="animated-bg relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
       {/* Particules néon flottantes */}
@@ -178,24 +252,28 @@ export default function HomePage() {
           />
         </motion.div>
 
-        {/* CTA Buttons */}
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col sm:flex-row gap-4"
-        >
-          <button className="btn-primary text-base px-10 py-4">
-            Jouer
-          </button>
-          <button className="btn-secondary text-base px-10 py-4">
-            Créer une salle
-          </button>
-        </motion.div>
-
-        {/* Lien Pokédex */}
-        <motion.div variants={itemVariants}>
-          <Link to="/pokedex" className="btn-secondary text-base px-10 py-4">
-            Voir le Pokédex →
-          </Link>
+        {/* Profil joueur ou CTA onboarding */}
+        <motion.div variants={itemVariants} className="flex flex-col items-center gap-4">
+          {playerId ? (
+            <>
+              <PlayerCard />
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="btn-primary text-base px-10 py-4">
+                  Jouer
+                </button>
+                <Link to="/pokedex" className="btn-secondary text-base px-10 py-4">
+                  Voir le Pokédex →
+                </Link>
+              </div>
+            </>
+          ) : (
+            <button
+              className="btn-primary text-base px-12 py-4"
+              onClick={() => navigate('/onboarding')}
+            >
+              Commencer →
+            </button>
+          )}
         </motion.div>
 
         {/* Stats déco */}
