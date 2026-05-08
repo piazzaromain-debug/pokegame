@@ -27,13 +27,14 @@ async def health() -> dict:
 
 
 # Inclure les routers (squelettes pour l'instant)
-from app.api.routes import games, leaderboard, players, pokemon, stats  # noqa: E402
+from app.api.routes import achievements, games, leaderboard, players, pokemon, stats  # noqa: E402
 
 fastapi_app.include_router(pokemon.router, prefix="/api")
 fastapi_app.include_router(players.router, prefix="/api")
 fastapi_app.include_router(games.router, prefix="/api")
 fastapi_app.include_router(leaderboard.router, prefix="/api")
 fastapi_app.include_router(stats.router, prefix="/api")
+fastapi_app.include_router(achievements.router, prefix="/api")
 
 # Importer les handlers socket pour les enregistrer sur sio
 import app.sockets.game  # noqa: F401, E402

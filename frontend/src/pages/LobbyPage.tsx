@@ -5,6 +5,7 @@ import { usePlayerStore } from '../store/playerStore'
 import { useSocket } from '../hooks/useSocket'
 import { fetchGames, createGame } from '../api/games'
 import type { GameListItem, GameMode, Difficulty, GameCreate } from '../types/game'
+import { Particles } from '../components/effects/Particles'
 import '../styles/animations.css'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -463,6 +464,9 @@ export default function LobbyPage() {
 
   return (
     <div className="animated-bg relative min-h-screen flex flex-col overflow-hidden">
+      {/* Particules flottantes */}
+      <Particles count={15} />
+
       {/* Scanlines */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.025]"

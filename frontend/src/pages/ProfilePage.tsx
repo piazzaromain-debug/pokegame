@@ -4,6 +4,8 @@ import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { fetchPlayerStats } from '../api/leaderboard'
 import type { PlayerStats } from '../api/leaderboard'
+import { useAchievements } from '../api/achievements'
+import type { AchievementData } from '../api/achievements'
 import { usePlayerStore } from '../store/playerStore'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import '../styles/animations.css'
@@ -200,6 +202,111 @@ function MistakeEntry({ pokemonId, count, rank, reducedMotion }: MistakeEntryPro
   )
 }
 
+// ─── Achievement grid ──────────────────────────────────────────────────────────
+
+const RARITY_BADGE: Record<string, { label: string; color: string; border: string; glow: string }> = {
+  common:    { label: 'Commun',    color: 'rgba(200,200,200,0.8)',   border: 'rgba(200,200,200,0.3)',  glow: '' },
+  rare:      { label: 'Rare',      color: 'rgba(96,165,250,0.9)',    border: 'rgba(96,165,250,0.5)',   glow: '0 0 10px rgba(96,165,250,0.3)' },
+  epic:      { label: 'Épique',    color: 'rgba(176,38,255,0.9)',    border: 'rgba(176,38,255,0.5)',   glow: '0 0 10px rgba(176,38,255,0.4)' },
+  legendary: { label: 'Légendaire', color: 'rgba(255,242,0,0.95)',   border: 'rgba(255,242,0,0.6)',    glow: '0 0 15px rgba(255,242,0,0.5)' },
+}
+
+interface AchievementGridProps {
+  allAchievements: AchievementData[]
+  unlockedCodes: Set<string>
+  reducedMotion: boolean
+}
+
+function AchievementGrid({ allAchievements, unlockedCodes, reducedMotion }: AchievementGridProps) {
+  return (
+    <div
+      className="glass-card p-4 grid gap-3"
+      style={{
+        border: '1px solid rgba(176,38,255,0.15)',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+      }}
+    >
+      {allAchievements.map((a, i) => {
+        const unlocked = unlockedCodes.has(a.code)
+        const badge = RARITY_BADGE[a.rarity] ?? RARITY_BADGE.common
+
+        if (!unlocked) {
+          return (
+            <div
+              key={a.code}
+              className="group relative flex flex-col items-center gap-2 p-3 rounded-xl cursor-default"
+              style={{
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.06)',
+              }}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ background: 'rgba(255,255,255,0.04)' }}
+              >
+                <span className="font-orbitron font-bold text-xl" style={{ color: 'rgba(255,255,255,0.15)' }}>?</span>
+              </div>
+              <span className="font-rajdhani text-xs text-center" style={{ color: 'rgba(255,255,255,0.2)' }}>
+                ???
+              </span>
+              {/* Tooltip */}
+              <div
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 pointer-events-none"
+                style={{ minWidth: '140px' }}
+              >
+                <div
+                  className="glass-card px-3 py-2 rounded-xl text-center"
+                  style={{ border: '1px solid rgba(255,255,255,0.12)' }}
+                >
+                  <p className="font-orbitron text-xs font-bold" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    Verrouillé
+                  </p>
+                  <p className="font-rajdhani text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                    {a.description_fr}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        return (
+          <motion.div
+            key={a.code}
+            initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: reducedMotion ? 0 : 0.3, delay: reducedMotion ? 0 : i * 0.04 }}
+            className="flex flex-col items-center gap-2 p-3 rounded-xl"
+            style={{
+              background: 'rgba(176,38,255,0.06)',
+              border: `1px solid ${badge.border}`,
+              boxShadow: badge.glow || undefined,
+            }}
+          >
+            <span className="text-3xl">{a.icon_emoji}</span>
+            <span
+              className="font-orbitron font-bold text-xs text-center leading-tight"
+              style={{ color: badge.color }}
+            >
+              {a.name_fr}
+            </span>
+            <span
+              className="font-rajdhani text-[10px] uppercase tracking-widest px-1.5 py-0.5 rounded"
+              style={{
+                color: badge.color,
+                border: `1px solid ${badge.border}`,
+                background: 'rgba(0,0,0,0.3)',
+              }}
+            >
+              {badge.label}
+            </span>
+          </motion.div>
+        )
+      })}
+    </div>
+  )
+}
+
 // ─── Loading skeleton ─────────────────────────────────────────────────────────
 
 function ProfileSkeleton() {
@@ -243,6 +350,8 @@ export default function ProfilePage() {
     enabled: !!targetId,
   })
 
+  const { data: allAchievements = [] } = useAchievements()
+
   if (!targetId) return null
 
   // Build Pokédex slot states
@@ -262,6 +371,14 @@ export default function ProfilePage() {
         .sort((a, b) => b.count - a.count)
         .slice(0, 5)
     : []
+
+  // Achievements unlocked by this player (from their stats if available, else derive from allAchievements)
+  // The backend may return unlocked codes in stats; here we use a best-effort approach:
+  // show all if no individual data available, locked state derived from server data when available.
+  const unlockedAchievementCodes: Set<string> = new Set(
+    (stats as (PlayerStats & { achievements_unlocked?: string[] }) | undefined)
+      ?.achievements_unlocked ?? []
+  )
 
   const displayAvatar = isOwnProfile ? avatarPokemonId : null
   const displayPseudo = isOwnProfile ? pseudo : `Dresseur #${targetId.slice(0, 6)}`
@@ -490,6 +607,38 @@ export default function ProfilePage() {
                     />
                   ))}
                 </div>
+              </motion.div>
+            )}
+
+            {/* Section achievements */}
+            {allAchievements.length > 0 && (
+              <motion.div
+                className="w-full"
+                initial={{ opacity: 0, y: reducedMotion ? 0 : 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: reducedMotion ? 0 : 0.5, delay: reducedMotion ? 0 : 0.8 }}
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <h2
+                    className="font-orbitron font-bold text-lg uppercase tracking-widest"
+                    style={{ color: '#b026ff', textShadow: '0 0 12px rgba(176,38,255,0.6)' }}
+                  >
+                    {isOwnProfile ? 'MES ACHIEVEMENTS' : 'ACHIEVEMENTS'}
+                  </h2>
+                  <div className="flex-1 h-px" style={{ background: 'linear-gradient(to right, rgba(176,38,255,0.4), transparent)' }} />
+                  <span
+                    className="font-orbitron text-sm font-bold"
+                    style={{ color: '#b026ff', textShadow: '0 0 8px rgba(176,38,255,0.5)' }}
+                  >
+                    {unlockedAchievementCodes.size}{' '}
+                    <span style={{ color: 'rgba(255,255,255,0.35)' }}>/ {allAchievements.length}</span>
+                  </span>
+                </div>
+                <AchievementGrid
+                  allAchievements={allAchievements}
+                  unlockedCodes={unlockedAchievementCodes}
+                  reducedMotion={reducedMotion}
+                />
               </motion.div>
             )}
           </div>

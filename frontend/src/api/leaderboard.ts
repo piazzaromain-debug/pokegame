@@ -71,6 +71,20 @@ export async function fetchGlobalStats(): Promise<GlobalStats> {
   return res.json()
 }
 
+export interface AchievementData {
+  code: string
+  name_fr: string
+  description_fr: string
+  icon_emoji: string
+  rarity: string
+}
+
+export async function fetchAchievements(): Promise<AchievementData[]> {
+  const res = await fetch('/api/achievements')
+  if (!res.ok) throw new Error('Erreur achievements')
+  return res.json()
+}
+
 export function useLeaderboard(mode: GameMode, difficulty: Difficulty, period: Period) {
   return useQuery({
     queryKey: ['leaderboard', mode, difficulty, period],

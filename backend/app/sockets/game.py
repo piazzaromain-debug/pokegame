@@ -10,6 +10,7 @@ from app.models.game import Difficulty, Game, GameStatus
 from app.models.game_player import GamePlayer
 from app.models.game_question import GameQuestion, PlayerAnswer
 from app.models.pokemon import Pokemon
+from app.services.achievement_engine import check_and_award_achievements, get_achievements_details
 from app.services.question_generator import generate_questions, get_time_limit_ms
 from app.services.scoring import calculate_points
 from app.services.stats_aggregator import aggregate_game_stats
@@ -241,8 +242,6 @@ async def _run_question_loop(game_id: str, difficulty_str: str, room_name: str) 
     for i, entry in enumerate(final_scoreboard):
         entry["rank"] = i + 1
 
-    await sio.emit("game:finished", {"final_scoreboard": final_scoreboard}, room=room_name)
-
     # Persister en DB
     async with AsyncSessionLocal() as db:
         await db.execute(
@@ -259,6 +258,33 @@ async def _run_question_loop(game_id: str, difficulty_str: str, room_name: str) 
             )
         await db.commit()
         await aggregate_game_stats(db, uuid.UUID(game_id), final_scoreboard)
+
+        # Vérifier et attribuer les achievements pour chaque joueur
+        achievements_by_player: dict[str, list] = {}
+        for entry in final_scoreboard:
+            pid = uuid.UUID(entry["player_id"])
+            unlocked_codes = await check_and_award_achievements(
+                db=db,
+                player_id=pid,
+                game_id=uuid.UUID(game_id),
+                final_rank=entry["rank"],
+                total_players=len(final_scoreboard),
+            )
+            if unlocked_codes:
+                details = await get_achievements_details(db, unlocked_codes)
+                achievements_by_player[entry["player_id"]] = details
+        await db.commit()
+
+    # Émettre game:finished individuellement pour inclure les achievements propres à chaque joueur
+    for entry in final_scoreboard:
+        pid = entry["player_id"]
+        player_data = room.players.get(pid, {})
+        player_sid = player_data.get("sid")
+        if player_sid:
+            await sio.emit("game:finished", {
+                "final_scoreboard": final_scoreboard,
+                "achievements_unlocked": achievements_by_player.get(pid, []),
+            }, to=player_sid)
 
     room.status = "finished"
     logger.info(

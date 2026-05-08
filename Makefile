@@ -24,6 +24,9 @@ logs-front:            ## Logs frontend uniquement
 seed:                  ## Lance le seed Pokémon depuis PokeAPI
 	docker compose exec backend python scripts/seed.py
 
+seed-achievements:     ## Charge le catalogue des achievements
+	docker compose exec backend python scripts/seed_achievements.py
+
 reset-db:              ## ⚠️ Reset complet de la BDD (données perdues !)
 	docker compose down -v
 	docker compose up -d db

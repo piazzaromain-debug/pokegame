@@ -12,6 +12,8 @@ import {
   type ScoreEntry,
   type GamePhase,
 } from '../store/gameStore'
+import { AchievementToast } from '../components/effects/AchievementToast'
+import type { AchievementData } from '../components/effects/AchievementToast'
 
 // ─── Types locaux ────────────────────────────────────────────────────────────
 
@@ -318,6 +320,7 @@ export default function GamePlayPage() {
   const [toasts, setToasts] = useState<FloatingToast[]>([])
   const [reactions, setReactions] = useState<FloatingReaction[]>([])
   const [showScoreboard, setShowScoreboard] = useState(false)
+  const [unlockedAchievements, setUnlockedAchievements] = useState<AchievementData[]>([])
   const toastIdRef = useRef(0)
   const reactionIdRef = useRef(0)
 
@@ -391,12 +394,17 @@ export default function GamePlayPage() {
       }, 2000)
     })
 
-    const offFinished = on<{ final_scoreboard: ScoreEntry[] }>('game:finished', (data) => {
+    const offFinished = on<{ final_scoreboard: ScoreEntry[]; achievements_unlocked?: AchievementData[] }>('game:finished', (data) => {
       timer.stop()
       setFinalScoreboard(data.final_scoreboard)
       setLocalPhase('finished')
       setPhase('finished')
-      setTimeout(() => navigate(`/game/${gameId}/results`), 800)
+      if (data.achievements_unlocked && data.achievements_unlocked.length > 0) {
+        setUnlockedAchievements(data.achievements_unlocked)
+        setTimeout(() => navigate(`/game/${gameId}/results`), 3000)
+      } else {
+        setTimeout(() => navigate(`/game/${gameId}/results`), 800)
+      }
     })
 
     return () => {
@@ -451,6 +459,12 @@ export default function GamePlayPage() {
         <div className="font-orbitron text-2xl text-neon-cyan animate-pulse">
           Fin de partie...
         </div>
+        <AchievementToast
+          achievements={unlockedAchievements}
+          onDismiss={(code) =>
+            setUnlockedAchievements((prev) => prev.filter((a) => a.code !== code))
+          }
+        />
       </div>
     )
   }
