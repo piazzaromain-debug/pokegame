@@ -39,19 +39,19 @@ class Game(Base):
         nullable=False,
     )
     mode: Mapped[GameMode] = mapped_column(
-        sa.Enum(GameMode, name="game_mode"),
+        sa.Enum(GameMode, name="game_mode", values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=GameMode.GUESS_NAME,
     )
     difficulty: Mapped[Difficulty] = mapped_column(
-        sa.Enum(Difficulty, name="difficulty"),
+        sa.Enum(Difficulty, name="difficulty", values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=Difficulty.NORMAL,
     )
     nb_questions: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=10)
     max_players: Mapped[int] = mapped_column(sa.Integer, nullable=False, default=8)
     status: Mapped[GameStatus] = mapped_column(
-        sa.Enum(GameStatus, name="game_status"),
+        sa.Enum(GameStatus, name="game_status", values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=GameStatus.WAITING,
     )
