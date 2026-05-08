@@ -1,11 +1,12 @@
 import { Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
-// Les autres pages seront ajoutées au fur et à mesure
+import PokemonDexPage from './pages/PokemonDexPage'
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
+      <Route path="/pokedex" element={<PokemonDexPage />} />
     </Routes>
   )
 }

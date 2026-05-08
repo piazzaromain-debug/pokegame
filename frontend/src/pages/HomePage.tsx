@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import '../styles/animations.css'
 
 // Données statiques pour les particules néon flottantes
@@ -188,6 +189,13 @@ export default function HomePage() {
           <button className="btn-secondary text-base px-10 py-4">
             Créer une salle
           </button>
+        </motion.div>
+
+        {/* Lien Pokédex */}
+        <motion.div variants={itemVariants}>
+          <Link to="/pokedex" className="btn-secondary text-base px-10 py-4">
+            Voir le Pokédex →
+          </Link>
         </motion.div>
 
         {/* Stats déco */}
