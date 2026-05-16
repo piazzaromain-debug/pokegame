@@ -364,31 +364,21 @@ export default function GameRoomPage() {
             transition={{ duration: 0.4, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col items-center gap-3 mt-auto pt-4"
           >
-            <div className="relative group">
-              <button
-                onClick={handleStartGame}
-                disabled
-                className="font-orbitron font-bold text-sm uppercase tracking-widest px-10 py-4 rounded-xl transition-all duration-200 cursor-not-allowed"
-                style={{
-                  color: 'rgba(255,255,255,0.3)',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                }}
-              >
-                Lancer la partie ▶
-              </button>
-              {/* Tooltip */}
-              <div
-                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 rounded-lg font-rajdhani text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none whitespace-nowrap"
-                style={{
-                  background: 'rgba(10,6,18,0.95)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(255,255,255,0.6)',
-                }}
-              >
-                Bientôt disponible (Phase 5)
-              </div>
-            </div>
+            <motion.button
+              onClick={handleStartGame}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
+              className="font-orbitron font-bold text-sm uppercase tracking-widest px-10 py-4 rounded-xl transition-all duration-200"
+              style={{
+                color: '#0a0612',
+                background: 'linear-gradient(135deg, #00f5ff, #b026ff)',
+                border: 'none',
+                boxShadow: '0 0 30px rgba(0,245,255,0.4), 0 0 60px rgba(176,38,255,0.2)',
+                cursor: 'pointer',
+              }}
+            >
+              Lancer la partie ▶
+            </motion.button>
             <p className="font-rajdhani text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
               Seul l'hôte peut lancer la partie
             </p>
